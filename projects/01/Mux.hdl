@@ -19,4 +19,5 @@ CHIP Mux {
     And(a=b, b=sel, out=bsel);
     And(a=a, b=nsel, out=asel);
     Or(a=bsel, b=asel, out=out);
+    // Yeees we have if statement
 }

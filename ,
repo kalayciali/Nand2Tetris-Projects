@@ -36,10 +36,6 @@ CHIP ALU {
         f,  // compute out = x + y (if 1) or x & y (if 0)
         no; // negate the out output?
 
-        // it calculates two way whether the f is 0 or 1
-        // it's not quite efficient
-
-
     OUT 
         out[16], // 16-bit output
         zr, // 1 if (out == 0), 0 otherwise
@@ -47,32 +43,7 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
-
    ALUPreset(in=x, zin=zx, nin=nx, out=presetx);
    ALUPreset(in=y, zin=zy, nin=ny, out=presety);
-
-   // function part
-   And16(a=presetx, b=presety, out=anded);
-   Add16(a=presetx,  b=presety, out=added);
-   Mux16(a=anded, b=added, sel=f, out=preout);
-
-   // output fix
-   Not16(in=preout, out=negatedout);
-   Mux16(a=preout, b=negatedout, sel=no, out=output);
-
-   // you couldn't do operations after you set out
-   // so use out as output until last line
-
-   // whether output is zero or not
-
-   // you couldn't divide and select from the input bus
-
-   Or16Way(in=output, out=isoutnotzero);
-   Not(in=isoutnotzero, out=zr);
-
-   // whether output is negative or not
-   And16(a=true, b=output, out[15]=ng, out[0..14]=garbage);
-
-   // release output
-   And16(a=output, b=true, out=out);
+   Add16(a=presetx,  b=presety, out=added)
 }
