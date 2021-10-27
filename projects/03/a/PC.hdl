@@ -17,4 +17,15 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+
+    // combinational logic
+
+    Inc16(in=rout, out=incout);
+    Mux16(a=rout, b=incout, sel=inc, out=preout);
+    Mux16(a=preout, b=in, sel=load, out=outorintoout);
+    Mux16(a=outorintoout, b=false, sel=reset, out=out0);
+
+    // sequential logic
+    Register(in=out0, load=true, out=rout, out=out);
 }
+
