@@ -10,3 +10,36 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
+
+// Preset variables i and R[2]
+
+@i
+M = 1
+@2
+M = 0
+
+(LOOP)
+
+// loop until i == R[0]
+@i
+D = M
+@0
+D = D - M
+@END
+D; JGT
+
+// add R[0] with R[1] store it to R[2]
+@1
+D = M
+@2
+M = D + M 
+@i
+M = M + 1
+@LOOP
+0; JMP
+
+(END)
+// nonstop loop to finish program
+@END
+0; JMP
+
