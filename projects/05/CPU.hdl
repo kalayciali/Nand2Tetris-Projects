@@ -40,4 +40,58 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    // 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
+    // 1  1  1  a  c1 c2 c3 c4 c5 c6 d1 d2 d3 j1 j2 j3
+    //         M/A zx nx zy ny f  no A  D  M  
+
+
+    // first get type of instruction
+    Not(in=instruction[15], out=Ainstruct);
+    Not(in=Ainstruct, out=Cinstruct);
+
+    // select what to laod to A
+
+    // if C instruct and load to A, select ALUout as in
+    And(a=Cinstruct, b=instruction[5], out=ALUtoA);
+    Mux16(a=instruction, b=ALUout, sel=ALUtoA, out=Ain);
+
+    // in order to write to A, it needs to be Ainstruct or ALUtoA
+    Or(a=Ainstruct, b=ALUtoA, out=Aload);
+    ARegister(in=Ain, load=Aload, out=Aout);
+
+    // select A or M to fed to ALU
+    Mux16(a=Aout, b=inM, sel=instruction[12], out=MorAasy);
+
+    // whether to load to D
+    And(a=Cinstruct, b=instruction[4], out=ALUtoD);
+    DRegister(in=ALUout, load=ALUtoD, out=Dout);
+
+    // now ALU part
+    ALU(x=Dout, y=MorAasy, 
+    zx=instruction[11], nx=instruction[10], 
+    zy=instruction[9], ny=instruction[8], 
+    f=instruction[7], no=instruction[6], 
+    out=ALUout, zr=zr, ng=ng);
+
+    // PC
+    And(a=zr, b=instruction[1], out=Jeq);
+    And(a=ng, b=instruction[2], out=Jlt);
+    Or(a=zr, b=ng, out=zeroorneg);
+    Not(in=zeroorneg, out=pzt);
+    And(a=pzt, b=instruction[0], out=Jgt);
+
+    // if there is jump cond 
+    Or(a=Jeq, b=Jlt, out=Jle);
+    Or(a=Jle, b=Jgt, out=JumpA);
+    // only jump if it is C instruction
+    And(a=Cinstruct, b=JumpA, out=CandJumpA);
+    Not(in=CandJumpA, out=CandInc);
+    PC(in=Aout, inc=CandInc, load=CandJumpA, reset=reset, out[0..14]=pc);
+
+    // release all outputs
+    Or16(a=false, b=Aout, out[0..14]=addressM);
+    Or16(a=false, b=ALUout, out=outM);
+    And(a=Cinstruct, b=instruction[3], out=writeM);
+    
 }

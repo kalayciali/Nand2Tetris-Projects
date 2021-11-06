@@ -28,4 +28,23 @@ CHIP Memory {
 
     PARTS:
     // Put your code here:
+
+    // according to most significant 2 digits
+    // 00 RAM 
+    // 01 RAM
+    // 10 Screen 
+    // 11 Keyboard
+
+    // first differentiate between ram or iodevices
+    DMux(in=load, sel=address[14], a=loadtoram, b=loadtoio);
+    RAM16K(in=in, load=loadtoram, address=address[0..13], out=outfromram);
+
+    //differentiate between screen or kbd
+    DMux(in=loadtoio, sel=address[13], a=loadtoscreen, b=loadtokbd);
+    Screen(in=in, load=loadtoscreen, address=address[0..12], out=outfromscreen);
+    Keyboard(out=outfromkbd);
+
+    // select output according to most significant 2 digits
+    Mux4Way16(a=outfromram, b=outfromram, c=outfromscreen, d=outfromkbd, sel=address[13..14], out=out);
+
 }
